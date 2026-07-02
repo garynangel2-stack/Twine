@@ -1,0 +1,2 @@
+-- Deprecated. Twine now uses a pure-JS, file-backed store (see src/lib/store.ts).
+-- This file is no longer used and can be deleted.

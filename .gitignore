@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+*.log
+.DS_Store
+data/twine.db
+data/*.db
+data/*.db-*
+data/*.json
+.env
+.env.local
+next-env.d.ts
