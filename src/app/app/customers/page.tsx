@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getSessionUser } from "@/lib/auth";
 import { listCustomers } from "@/lib/queries";
 import { PageHeader } from "@/components/PageHeader";
@@ -31,7 +32,9 @@ export default function CustomersPage() {
               )}
               {customers.map((c) => (
                 <tr key={c.id} className="hover:bg-black/[0.02]">
-                  <td className="px-5 py-3 font-medium">{c.name}</td>
+                  <td className="px-5 py-3 font-medium">
+                    <Link href={`/app/customers/${c.id}`} className="hover:underline">{c.name}</Link>
+                  </td>
                   <td className="px-5 py-3 text-ink/60">{c.email ?? "—"}</td>
                   <td className="px-5 py-3 text-ink/60">{c.phone ?? "—"}</td>
                   <td className="px-5 py-3 text-ink/60">{c.address ?? "—"}</td>
