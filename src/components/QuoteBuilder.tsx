@@ -5,13 +5,25 @@ import { useRouter } from "next/navigation";
 
 type Customer = { id: number; name: string };
 type Item = { description: string; qty: number; unit_price: number };
+type Initial = {
+  id: number;
+  customer_id: number | null;
+  valid_until: string | null;
+  notes: string | null;
+  items: Item[];
+};
 
-export function QuoteBuilder({ customers }: { customers: Customer[] }) {
+export function QuoteBuilder({ customers, initial }: { customers: Customer[]; initial?: Initial }) {
   const router = useRouter();
-  const [customerId, setCustomerId] = useState<string>(customers[0]?.id?.toString() ?? "");
-  const [validUntil, setValidUntil] = useState("");
-  const [notes, setNotes] = useState("");
-  const [items, setItems] = useState<Item[]>([{ description: "", qty: 1, unit_price: 0 }]);
+  const editing = !!initial;
+  const [customerId, setCustomerId] = useState<string>(
+    initial?.customer_id?.toString() ?? customers[0]?.id?.toString() ?? ""
+  );
+  const [validUntil, setValidUntil] = useState(initial?.valid_until ?? "");
+  const [notes, setNotes] = useState(initial?.notes ?? "");
+  const [items, setItems] = useState<Item[]>(
+    initial?.items?.length ? initial.items : [{ description: "", qty: 1, unit_price: 0 }]
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -38,16 +50,17 @@ export function QuoteBuilder({ customers }: { customers: Customer[] }) {
       return;
     }
     setSaving(true);
-    const res = await fetch("/api/quotes", {
-      method: "POST",
+    const payload = {
+      customer_id: customerId ? Number(customerId) : null,
+      valid_until: validUntil || null,
+      notes,
+      items: clean,
+      ...(editing ? {} : { status }),
+    };
+    const res = await fetch(editing ? `/api/quotes/${initial!.id}` : "/api/quotes", {
+      method: editing ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        customer_id: customerId ? Number(customerId) : null,
-        valid_until: validUntil || null,
-        notes,
-        status,
-        items: clean,
-      }),
+      body: JSON.stringify(payload),
     });
     const json = await res.json();
     setSaving(false);
@@ -55,7 +68,8 @@ export function QuoteBuilder({ customers }: { customers: Customer[] }) {
       setError(json.error || "Failed to save.");
       return;
     }
-    router.push(`/app/quotes/${json.id}`);
+    const targetId = editing ? initial!.id : json.id;
+    router.push(`/app/quotes/${targetId}`);
     router.refresh();
   }
 
@@ -131,10 +145,18 @@ export function QuoteBuilder({ customers }: { customers: Customer[] }) {
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <div className="flex gap-3">
-        <button className="btn-outline" disabled={saving} onClick={() => save("draft")}>Save draft</button>
-        <button className="btn-primary" disabled={saving} onClick={() => save("sent")}>
-          {saving ? "Saving…" : "Save & mark sent"}
-        </button>
+        {editing ? (
+          <button className="btn-primary" disabled={saving} onClick={() => save("draft")}>
+            {saving ? "Saving…" : "Save changes"}
+          </button>
+        ) : (
+          <>
+            <button className="btn-outline" disabled={saving} onClick={() => save("draft")}>Save draft</button>
+            <button className="btn-primary" disabled={saving} onClick={() => save("sent")}>
+              {saving ? "Saving…" : "Save & mark sent"}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
