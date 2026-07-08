@@ -31,7 +31,10 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-brand-50 px-5">
+    <main
+      className="app-dark relative flex min-h-screen items-center justify-center overflow-hidden bg-paper px-5"
+      style={{ backgroundImage: "radial-gradient(60% 50% at 50% 0%, rgba(63,181,135,0.14), transparent 70%)" }}
+    >
       <div className="w-full max-w-sm">
         <Link href="/" className="flex justify-center"><Logo className="text-xl text-ink" /></Link>
         <div className="card mt-6 p-8">
