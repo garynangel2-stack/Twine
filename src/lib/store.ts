@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 // ---- Types ----
-export type Business = { id: number; name: string; industry: string; phone: string | null; email: string | null; logo_initials: string | null; created_at: string };
+export type Business = { id: number; name: string; industry: string; phone: string | null; email: string | null; logo_initials: string | null; payment_provider?: "stripe" | "square" | null; created_at: string };
 export type User = { id: number; business_id: number | null; name: string; email: string; password: string; role: "owner" | "admin"; created_at: string };
 export type Customer = { id: number; business_id: number; name: string; email: string | null; phone: string | null; address: string | null; notes: string | null; created_at: string };
 export type QuoteItem = { id: number; quote_id: number; description: string; qty: number; unit_price: number };
