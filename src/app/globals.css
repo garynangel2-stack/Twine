@@ -14,9 +14,10 @@ body {
 
 body {
   @apply bg-paper text-ink antialiased;
+  font-feature-settings: "kern", "liga", "calt";
 }
 
-/* Reusable component classes */
+/* Reusable component classes (used by the product app + admin) */
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
@@ -43,3 +44,201 @@ body {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Marketing landing page — dark, editorial "vine" theme              */
+/* Scoped to .site so the product app + admin keep their light theme. */
+/* ------------------------------------------------------------------ */
+.site {
+  --vine: #3fb587;
+  --vine-soft: #7fe3b6;
+  background-color: #07100c;
+  color: #eef3ef;
+}
+
+.site ::selection {
+  background: rgba(63, 181, 135, 0.3);
+}
+
+/* Small uppercase tracked eyebrow label */
+.site .eyebrow {
+  @apply inline-flex items-center gap-2 text-xs font-medium uppercase;
+  letter-spacing: 0.18em;
+  color: var(--vine-soft);
+}
+
+/* Thin, tightly-tracked display headings */
+.site .display {
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+}
+
+/* Gradient vine accent on a headline fragment */
+.site .accent {
+  background: linear-gradient(100deg, var(--vine-soft), var(--vine) 60%, #1c9a6c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Buttons for the dark theme */
+.site .cta {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all;
+}
+.site .cta-primary {
+  color: #06120d;
+  background: linear-gradient(100deg, var(--vine-soft), var(--vine));
+}
+.site .cta-primary:hover {
+  filter: brightness(1.06);
+}
+.site .cta-ghost {
+  color: #eef3ef;
+  border: 1px solid rgba(238, 243, 239, 0.18);
+}
+.site .cta-ghost:hover {
+  border-color: rgba(238, 243, 239, 0.4);
+  background: rgba(238, 243, 239, 0.04);
+}
+
+/* Hairline card on dark */
+.site .panel {
+  border: 1px solid rgba(238, 243, 239, 0.1);
+  border-radius: 16px;
+  background: rgba(238, 243, 239, 0.02);
+}
+
+/* Hairline rule */
+.site .rule {
+  border-color: rgba(238, 243, 239, 0.1);
+}
+
+/* Dark-theme overrides for the shared form components (WaitlistForm)   */
+/* Scoped to .site so the product app + admin keep their light forms.   */
+.site .card {
+  background: rgba(238, 243, 239, 0.02);
+  border-color: rgba(238, 243, 239, 0.1);
+  box-shadow: none;
+  color: #eef3ef;
+}
+.site .label {
+  color: rgba(238, 243, 239, 0.55);
+}
+.site .input {
+  color: #eef3ef;
+  background: rgba(238, 243, 239, 0.04);
+  border-color: rgba(238, 243, 239, 0.15);
+  color-scheme: dark;
+}
+.site .input::placeholder {
+  color: rgba(238, 243, 239, 0.35);
+}
+.site .input:focus {
+  border-color: var(--vine);
+  --tw-ring-color: rgba(63, 181, 135, 0.35);
+}
+.site .input option {
+  color: #0f1115;
+}
+.site .btn-primary {
+  color: #06120d;
+  background: linear-gradient(100deg, var(--vine-soft), var(--vine));
+  border-radius: 9999px;
+}
+.site .btn-primary:hover {
+  background: linear-gradient(100deg, var(--vine-soft), var(--vine));
+  filter: brightness(1.06);
+}
+/* Success state uses text-ink/* utilities — keep readable on dark */
+.site .card .text-ink\/70 {
+  color: rgba(238, 243, 239, 0.7);
+}
+.site .card .text-ink\/50 {
+  color: rgba(238, 243, 239, 0.5);
+}
+
+/* ------------------------------------------------------------------ */
+/* Obsidian dark theme for the product app + admin back office        */
+/* Scoped to .app-dark (set on the app/admin layout wrappers) so the  */
+/* reskin re-maps the light utility classes without editing 25 pages. */
+/* ------------------------------------------------------------------ */
+.app-dark {
+  --ob-bg: #07100c;
+  --ob-surface: #0e1613;
+  --ob-surface-2: #121c18;
+  --ob-border: rgba(238, 243, 239, 0.1);
+  --ob-text: #eef3ef;
+  --vine: #3fb587;
+  --vine-soft: #7fe3b6;
+  background-color: var(--ob-bg);
+  color: var(--ob-text);
+}
+.app-dark ::selection { background: rgba(63, 181, 135, 0.3); }
+
+/* Surfaces */
+.app-dark .bg-paper { background-color: var(--ob-bg); }
+.app-dark .bg-white { background-color: var(--ob-surface); }
+.app-dark .bg-brand-50 { background-color: rgba(63, 181, 135, 0.12); }
+
+/* Text */
+.app-dark .text-ink { color: var(--ob-text); }
+.app-dark .text-ink\/40 { color: rgba(238, 243, 239, 0.4); }
+.app-dark .text-ink\/50 { color: rgba(238, 243, 239, 0.5); }
+.app-dark .text-ink\/60 { color: rgba(238, 243, 239, 0.6); }
+.app-dark .text-ink\/70 { color: rgba(238, 243, 239, 0.75); }
+.app-dark .text-ink\/80 { color: rgba(238, 243, 239, 0.85); }
+.app-dark .text-brand-600,
+.app-dark .text-brand-700 { color: var(--vine-soft); }
+
+/* Borders + dividers */
+.app-dark .border-black\/5 { border-color: var(--ob-border); }
+.app-dark .border-black\/10 { border-color: rgba(238, 243, 239, 0.14); }
+.app-dark .divide-black\/5 > :not([hidden]) ~ :not([hidden]) { border-color: var(--ob-border); }
+
+/* Hover states */
+.app-dark .hover\:bg-black\/5:hover { background-color: rgba(238, 243, 239, 0.05); }
+.app-dark .hover\:text-ink:hover { color: var(--ob-text); }
+
+/* Static translucent surfaces */
+.app-dark .bg-black\/5 { background-color: rgba(238, 243, 239, 0.05); }
+
+/* Shared component classes on dark */
+.app-dark .card {
+  background: var(--ob-surface);
+  border-color: var(--ob-border);
+  box-shadow: none;
+  color: var(--ob-text);
+}
+.app-dark .input {
+  color: var(--ob-text);
+  background: rgba(238, 243, 239, 0.04);
+  border-color: rgba(238, 243, 239, 0.15);
+  color-scheme: dark;
+}
+.app-dark .input::placeholder { color: rgba(238, 243, 239, 0.35); }
+.app-dark .input:focus { border-color: var(--vine); --tw-ring-color: rgba(63, 181, 135, 0.3); }
+.app-dark .input option { color: #0f1115; }
+.app-dark .label { color: rgba(238, 243, 239, 0.55); }
+.app-dark .btn-outline {
+  background: transparent;
+  color: var(--ob-text);
+  border-color: rgba(238, 243, 239, 0.18);
+}
+.app-dark .btn-outline:hover { background: rgba(238, 243, 239, 0.05); }
+.app-dark .btn-ghost:hover { background: rgba(238, 243, 239, 0.06); }
+
+/* Active sidebar item */
+.app-dark .bg-brand-50.text-brand-700 { color: var(--vine-soft); }
+
+/* Status badges → dark-tinted chips with light text */
+.app-dark .bg-brand-100 { background-color: rgba(63, 181, 135, 0.16); }
+.app-dark .bg-blue-100 { background-color: rgba(96, 165, 250, 0.16); }
+.app-dark .bg-amber-100 { background-color: rgba(245, 158, 11, 0.16); }
+.app-dark .bg-red-100 { background-color: rgba(248, 113, 113, 0.16); }
+.app-dark .bg-gray-100 { background-color: rgba(238, 243, 239, 0.08); }
+.app-dark .text-blue-700 { color: #93c5fd; }
+.app-dark .text-amber-800 { color: #fcd34d; }
+.app-dark .text-red-700 { color: #fca5a5; }
+.app-dark .text-gray-700 { color: rgba(238, 243, 239, 0.72); }
+.app-dark .text-red-600 { color: #fca5a5; }
