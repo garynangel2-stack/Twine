@@ -60,6 +60,18 @@ export function listInvoices(bizId: number): Invoice[] {
     .map((i) => ({ ...i, customer_name: customerName(bizId, i.customer_id) }));
 }
 
+export function quotesByCustomer(bizId: number, customerId: number): Quote[] {
+  return listQuotes(bizId).filter((q) => q.customer_id === customerId);
+}
+
+export function bookingsByCustomer(bizId: number, customerId: number): Booking[] {
+  return listBookings(bizId).filter((b) => b.customer_id === customerId);
+}
+
+export function invoicesByCustomer(bizId: number, customerId: number): Invoice[] {
+  return listInvoices(bizId).filter((i) => i.customer_id === customerId);
+}
+
 export function getReminderSettings(bizId: number) {
   const d = getData();
   let row = d.reminder_settings.find((r) => r.business_id === bizId);
