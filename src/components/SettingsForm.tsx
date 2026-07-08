@@ -9,10 +9,34 @@ type Settings = {
   review_request_enabled: number;
 };
 
-export function SettingsForm({ settings }: { settings: Settings }) {
+type Integrations = {
+  stripe: boolean;
+  square: boolean;
+  quickbooks: boolean;
+  payroll: boolean;
+};
+
+function StatusPill({ ok }: { ok: boolean }) {
+  return (
+    <span className={`badge ${ok ? "bg-brand-100 text-brand-700" : "bg-gray-100 text-gray-700"}`}>
+      {ok ? "Connected" : "Not connected"}
+    </span>
+  );
+}
+
+export function SettingsForm({
+  settings,
+  paymentProvider,
+  integrations,
+}: {
+  settings: Settings;
+  paymentProvider: "stripe" | "square";
+  integrations: Integrations;
+}) {
   const router = useRouter();
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [provider, setProvider] = useState<"stripe" | "square">(paymentProvider);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -25,6 +49,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
         booking_reminder_hours: Number(data.booking_reminder_hours),
         invoice_followup_days: Number(data.invoice_followup_days),
         review_request_enabled: data.review_request_enabled === "on" ? 1 : 0,
+        payment_provider: provider,
       }),
     });
     setBusy(false);
@@ -32,6 +57,8 @@ export function SettingsForm({ settings }: { settings: Settings }) {
     setTimeout(() => setSaved(false), 2500);
     router.refresh();
   }
+
+  const providerConnected = provider === "stripe" ? integrations.stripe : integrations.square;
 
   return (
     <form onSubmit={onSubmit} className="max-w-lg space-y-6">
@@ -61,6 +88,38 @@ export function SettingsForm({ settings }: { settings: Settings }) {
             <span className="block text-sm text-ink/60">Ask happy customers for a review after a completed job.</span>
           </span>
         </label>
+      </div>
+
+      <div className="card p-6">
+        <label className="label">Payments</label>
+        <p className="mb-3 text-sm text-ink/60">Choose the card processor used for invoice payment links.</p>
+        <div className="flex gap-2">
+          {(["stripe", "square"] as const).map((p) => (
+            <button
+              type="button"
+              key={p}
+              onClick={() => setProvider(p)}
+              className={`btn ${provider === p ? "btn-primary" : "btn-outline"} capitalize`}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+        <div className="mt-3 flex items-center gap-2 text-sm text-ink/60">
+          <StatusPill ok={providerConnected} />
+          {!providerConnected && <span>Add the {provider} keys in your environment to go live.</span>}
+        </div>
+      </div>
+
+      <div className="card p-6">
+        <label className="label">Integrations</label>
+        <ul className="mt-2 space-y-2 text-sm">
+          <li className="flex items-center justify-between"><span>Stripe</span><StatusPill ok={integrations.stripe} /></li>
+          <li className="flex items-center justify-between"><span>Square</span><StatusPill ok={integrations.square} /></li>
+          <li className="flex items-center justify-between"><span>QuickBooks Online</span><StatusPill ok={integrations.quickbooks} /></li>
+          <li className="flex items-center justify-between"><span>QuickBooks Payroll</span><StatusPill ok={integrations.payroll} /></li>
+        </ul>
+        <p className="mt-3 text-xs text-ink/50">Connection status reflects the keys configured in your environment.</p>
       </div>
 
       <div className="flex items-center gap-3">

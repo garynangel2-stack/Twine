@@ -10,7 +10,8 @@ const NAV = [
   { href: "/app/bookings", label: "Bookings", icon: "🗓" },
   { href: "/app/invoices", label: "Invoices", icon: "＄" },
   { href: "/app/customers", label: "Customers", icon: "☺" },
-  { href: "/app/settings", label: "Reminders", icon: "⏰" },
+  { href: "/app/payroll", label: "Payroll", icon: "💵" },
+  { href: "/app/settings", label: "Settings", icon: "⚙" },
 ];
 
 export function Sidebar({ userName, businessName }: { userName: string; businessName: string }) {
