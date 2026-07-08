@@ -7,25 +7,31 @@ export function Logo({ className = "", mark = true }: { className?: string; mark
   );
 }
 
-// A simple vine/twine tendril mark.
+// A dark-green vine/twine tendril mark.
 export function TwineMark({ className = "h-6 w-6" }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={className} fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+      {/* main climbing vine — deep green */}
       <path
         d="M16 30C16 22 8 22 8 15C8 9 12 6 16 6C20 6 24 9 24 15C24 22 16 22 16 30Z"
         stroke="currentColor"
         strokeWidth="2.4"
         strokeLinecap="round"
-        className="text-brand-500"
+        className="text-brand-700"
       />
+      {/* tendrils — slightly lighter green for depth */}
       <path
         d="M16 6C16 6 15 3 12 2.5M16 12C16 12 18 10 20.5 10.5"
         stroke="currentColor"
         strokeWidth="2.4"
         strokeLinecap="round"
-        className="text-brand-400"
+        className="text-brand-500"
       />
-      <circle cx="16" cy="18" r="2" className="fill-accent" />
+      {/* leaf */}
+      <path
+        d="M16 18c2.6 0 4.2-1.6 4.2-4-2.6 0-4.2 1.6-4.2 4Z"
+        className="fill-brand-600"
+      />
     </svg>
   );
 }
