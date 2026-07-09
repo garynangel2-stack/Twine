@@ -11,6 +11,7 @@ export type PaymentLinkResult = {
   url: string;
   provider: PaymentProvider | "mock";
   mock: boolean;
+  ref?: string | null; // provider reference used to match incoming webhooks
   error?: string;
 };
 
@@ -19,6 +20,7 @@ type LinkOpts = {
   amount: number; // in dollars
   description: string;
   invoiceNumber: string;
+  invoiceId: number; // used as the webhook match key
 };
 
 function mockUrl(invoiceNumber: string): string {
@@ -36,9 +38,11 @@ export async function createPaymentLink(opts: LinkOpts): Promise<PaymentLinkResu
   return { url: mockUrl(opts.invoiceNumber), provider: "mock", mock: true };
 }
 
-async function stripeLink({ amount, description, invoiceNumber }: LinkOpts): Promise<PaymentLinkResult> {
+async function stripeLink({ amount, description, invoiceNumber, invoiceId }: LinkOpts): Promise<PaymentLinkResult> {
   const body = new URLSearchParams();
   body.set("mode", "payment");
+  // client_reference_id lets the webhook map the paid session back to this invoice.
+  body.set("client_reference_id", String(invoiceId));
   body.set("success_url", `${appUrl()}/app/invoices?paid=${encodeURIComponent(invoiceNumber)}`);
   body.set("cancel_url", `${appUrl()}/app/invoices`);
   body.set("line_items[0][quantity]", "1");
@@ -56,10 +60,10 @@ async function stripeLink({ amount, description, invoiceNumber }: LinkOpts): Pro
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json?.error?.message || `Stripe ${res.status}`);
-  return { url: json.url, provider: "stripe", mock: false };
+  return { url: json.url, provider: "stripe", mock: false, ref: json.id };
 }
 
-async function squareLink({ amount, description, invoiceNumber }: LinkOpts): Promise<PaymentLinkResult> {
+async function squareLink({ amount, description, invoiceNumber, invoiceId }: LinkOpts): Promise<PaymentLinkResult> {
   const res = await fetch(`${SQ.base()}/v2/online-checkout/payment-links`, {
     method: "POST",
     headers: {
@@ -68,7 +72,7 @@ async function squareLink({ amount, description, invoiceNumber }: LinkOpts): Pro
       "Square-Version": "2024-06-04",
     },
     body: JSON.stringify({
-      idempotency_key: `${invoiceNumber}-${Date.now()}`,
+      idempotency_key: `${invoiceId}-${Date.now()}`,
       quick_pay: {
         name: description || `Invoice ${invoiceNumber}`,
         price_money: { amount: Math.round(amount * 100), currency: "USD" },
@@ -78,5 +82,6 @@ async function squareLink({ amount, description, invoiceNumber }: LinkOpts): Pro
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json?.errors?.[0]?.detail || `Square ${res.status}`);
-  return { url: json?.payment_link?.url, provider: "square", mock: false };
+  // Store the order id so the payment webhook can match this invoice.
+  return { url: json?.payment_link?.url, provider: "square", mock: false, ref: json?.payment_link?.order_id ?? null };
 }
