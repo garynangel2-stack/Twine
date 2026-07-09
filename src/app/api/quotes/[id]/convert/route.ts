@@ -22,19 +22,22 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
   const number = `INV-${2001 + count}`;
   const due = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
 
+  // Allocate the invoice id first so the payment link can reference it (used by webhooks).
+  const invId = nextId("invoices");
+
   // Payment link via the business's chosen provider (mock link if unconfigured).
   const link = await createPaymentLink({
     provider: biz?.payment_provider ?? null,
     amount: quote.total,
     description: `Invoice ${number}`,
     invoiceNumber: number,
+    invoiceId: invId,
   });
 
-  const invId = nextId("invoices");
   d.invoices.push({
     id: invId, business_id: bizId, customer_id: quote.customer_id, quote_id: quote.id, number,
     status: "sent", issued_date: today(), due_date: due, total: quote.total, paid_at: null,
-    payment_link: link.url, created_at: now(),
+    payment_link: link.url, payment_ref: link.ref ?? null, created_at: now(),
   });
   for (const i of items) {
     d.invoice_items.push({ id: nextId("invoice_items"), invoice_id: invId, description: i.description, qty: i.qty, unit_price: i.unit_price });
